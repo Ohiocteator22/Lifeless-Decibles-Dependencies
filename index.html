@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Decibles — a modular IDE for building, not babysitting your tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f2ee;
+    --panel: #ffffff;
+    --panel-line: #dedad2;
+    --text: #1c1b19;
+    --text-dim: #6b6558;
+    --accent: #c17a1f;
+    --accent-2: #2f7d74;
+    --accent-bg: #c17a1f1a;
+    --meter-off: #e3ddd1;
+    color-scheme: light;
+    --font-display: 'Manrope', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1c20;
+      --panel: #212429;
+      --panel-line: #33373e;
+      --text: #ece8e0;
+      --text-dim: #9a9589;
+      --accent: #e3a84e;
+      --accent-2: #5fb4a8;
+      --accent-bg: #e3a84e22;
+      --meter-off: #34383f;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1a1c20;
+    --panel: #212429;
+    --panel-line: #33373e;
+    --text: #ece8e0;
+    --text-dim: #9a9589;
+    --accent: #e3a84e;
+    --accent-2: #5fb4a8;
+    --accent-bg: #e3a84e22;
+    --meter-off: #34383f;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: calc(72px + env(safe-area-inset-top, 0px)); }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    line-height: 1.55;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--bg);
+    z-index: 50;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+  header.nav {
+    position: sticky;
+    top: env(safe-area-inset-top, 0px);
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--panel-line);
+  }
+  .nav-inner {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .brand { display: flex; align-items: baseline; gap: 10px; font-weight: 800; font-size: 1.05rem; letter-spacing: -0.01em; text-decoration: none; }
+  .brand small { font-family: var(--font-mono); font-weight: 500; font-size: 0.68rem; color: var(--text-dim); letter-spacing: 0; }
+  nav.links { display: flex; gap: 20px; overflow-x: auto; scrollbar-width: none; }
+  nav.links::-webkit-scrollbar { display: none; }
+  nav.links a { font-size: 0.88rem; color: var(--text-dim); text-decoration: none; white-space: nowrap; }
+  nav.links a:hover { color: var(--text); }
+
+  main { overflow-x: hidden; }
+
+  /* Hero */
+  .hero { padding: 72px 0 56px; }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 100px;
+    padding: 6px 12px 6px 10px;
+    margin-bottom: 28px;
+  }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  h1 {
+    font-size: clamp(2.1rem, 5vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 20px;
+    max-width: 14ch;
+  }
+  .lede { font-size: 1.1rem; color: var(--text-dim); max-width: 56ch; margin: 0 0 36px; }
+
+  /* Meter hero graphic */
+  .meter-rig { display: flex; align-items: flex-end; gap: 10px; height: 130px; margin: 8px 0 44px; }
+  .meter-col { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; max-width: 108px; }
+  .meter-track {
+    width: 100%;
+    height: 90px;
+    border-radius: 6px;
+    background: var(--meter-off);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--panel-line);
+  }
+  .meter-fill {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    height: 0%;
+    animation: rise 1.4s cubic-bezier(.2,.8,.2,1) forwards;
+    animation-delay: var(--d, 0s);
+  }
+  .meter-label { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim); text-align: center; }
+  @keyframes rise { to { height: var(--h, 40%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .meter-fill { animation: none; height: var(--h, 40%); }
+  }
+
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid transparent;
+  }
+  .btn-primary { background: var(--text); color: var(--bg); }
+  .btn-ghost { border-color: var(--panel-line); color: var(--text); }
+
+  /* Sections */
+  section { padding: 56px 0; border-top: 1px solid var(--panel-line); }
+  section.flush { border-top: none; }
+  h2 { font-size: 1.5rem; letter-spacing: -0.01em; margin: 0 0 6px; }
+  .section-sub { color: var(--text-dim); margin: 0 0 28px; max-width: 60ch; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--panel-line);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .card h3 { font-size: 0.98rem; margin: 0 0 8px; }
+  .card p { font-size: 0.9rem; color: var(--text-dim); margin: 0; }
+
+  .list-plain { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .list-plain li { display: flex; gap: 14px; border-bottom: 1px solid var(--panel-line); padding-bottom: 14px; }
+  .list-plain li:last-child { border-bottom: none; padding-bottom: 0; }
+  .list-plain .tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--accent-2);
+    white-space: nowrap;
+    padding-top: 2px;
+  }
+  .list-plain .body h3 { margin: 0 0 4px; font-size: 0.95rem; }
+  .list-plain .body p { margin: 0; font-size: 0.88rem; color: var(--text-dim); }
+
+  .notice {
+    background: var(--accent-bg);
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--panel-line));
+    border-radius: 10px;
+    padding: 16px 18px;
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .notice strong { color: var(--accent); }
+
+  .roadmap { display: flex; flex-direction: column; gap: 0; }
+  .road-row { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--panel-line); }
+  .road-row:last-child { border-bottom: none; }
+  .road-stage { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-dim); padding-top: 2px; }
+  .road-stage.active { color: var(--accent); }
+  .road-body h3 { margin: 0 0 4px; font-size: 0.95rem; }
+  .road-body p { margin: 0; font-size: 0.88rem; color: var(--text-dim); }
+
+  .faq-item { padding: 16px 0; border-bottom: 1px solid var(--panel-line); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-item summary { cursor: pointer; font-weight: 600; font-size: 0.96rem; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: "+"; color: var(--text-dim); font-weight: 400; }
+  .faq-item[open] summary::after { content: "–"; }
+  .faq-item p { color: var(--text-dim); margin: 10px 0 0; font-size: 0.9rem; max-width: 62ch; }
+
+  footer { border-top: 1px solid var(--panel-line); padding: 32px 0 48px; }
+  .footer-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-row p { margin: 0; font-size: 0.85rem; color: var(--text-dim); }
+  .footer-links { display: flex; gap: 18px; }
+  .footer-links a { font-size: 0.85rem; color: var(--text-dim); text-decoration: none; }
+  .footer-links a:hover { color: var(--text); }
+
+  code.inline { font-family: var(--font-mono); font-size: 0.85em; background: var(--accent-bg); padding: 1px 6px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">Decibles <small>planning phase</small></a>
+    <nav class="links">
+      <a href="#about">About</a>
+      <a href="#downloads">Downloads</a>
+      <a href="#docs">Docs</a>
+      <a href="#dependencies">Dependencies</a>
+      <a href="#source">Source</a>
+      <a href="#status">Status</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <span class="status-pill"><span class="status-dot"></span>In planning — nothing is implemented yet</span>
+    <h1>One place to build an app, instead of six tools pretending to be one.</h1>
+    <p class="lede">Decibles is a modular desktop IDE that orchestrates the compilers, SDKs, package managers, and build systems you already use — so creating, configuring, developing, testing, building, and shipping an app happen in one coherent environment.</p>
+
+    <div class="meter-rig" aria-hidden="true">
+      <div class="meter-col"><div class="meter-track"><div class="meter-fill" style="--h:30%; --d:0s"></div></div><span class="meter-label">configure</span></div>
+      <div class="meter-col"><div class="meter-track"><div class="meter-fill" style="--h:55%; --d:0.12s"></div></div><span class="meter-label">develop</span></div>
+      <div class="meter-col"><div class="meter-track"><div class="meter-fill" style="--h:40%; --d:0.24s"></div></div><span class="meter-label">test</span></div>
+      <div class="meter-col"><div class="meter-track"><div class="meter-fill" style="--h:70%; --d:0.36s"></div></div><span class="meter-label">build</span></div>
+      <div class="meter-col"><div class="meter-track"><div class="meter-fill" style="--h:20%; --d:0.48s"></div></div><span class="meter-label">distribute</span></div>
+    </div>
+
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#status">See current status</a>
+      <a class="btn btn-ghost" href="#source">View source on GitHub</a>
+    </div>
+  </div>
+
+  <section id="about">
+    <div class="wrap">
+      <h2>What Decibles is for</h2>
+      <p class="section-sub">Built for beginners learning to ship their first app and for experienced developers tired of hand-wiring the same toolchain every project. Decibles doesn't replace your compilers and SDKs — it orchestrates the ones that already exist.</p>
+      <div class="grid">
+        <div class="card"><h3>Three targets to start</h3><p>Desktop applications, web applications, and backend services and APIs. Python with PySide6 for desktop, FastAPI for backend — proposed directions, not locked commitments.</p></div>
+        <div class="card"><h3>Your project stays yours</h3><p>Ordinary source files, conventional structure, a Decibles manifest only where it helps. Existing projects import without being converted into a proprietary format.</p></div>
+        <div class="card"><h3>Lightweight by default</h3><p>The core install stays small. Language support, SDKs, and optional components download on demand, with verification and clear progress at every step.</p></div>
+        <div class="card"><h3>Honest about platforms</h3><p>Cross-platform support is based on real toolchains and real capabilities per OS — not a simulated "works everywhere" that quietly doesn't.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="downloads">
+    <div class="wrap">
+      <h2>Downloads</h2>
+      <p class="section-sub">Windows is the initial target platform, with Linux and macOS planned afterward.</p>
+      <div class="notice"><strong>Nothing to download yet.</strong> Decibles is still in planning — this section will list real builds, platforms, sizes, and install instructions once they exist.</div>
+    </div>
+  </section>
+
+  <section id="docs">
+    <div class="wrap">
+      <h2>Documentation</h2>
+      <p class="section-sub">Guides will cover installation, starting a new project, importing an existing one, dependency management, debugging, building, and troubleshooting — written as each feature is actually implemented and verified, not ahead of it.</p>
+      <div class="notice">No docs published yet. Check back as the planning phase turns into working features.</div>
+    </div>
+  </section>
+
+  <section id="dependencies">
+    <div class="wrap">
+      <h2>Dependencies &amp; components</h2>
+      <p class="section-sub">Optional components — language support, SDKs, debuggers, build tools — are fetched on demand rather than bundled into the installer. The planned distribution split:</p>
+      <ul class="list-plain">
+        <li><span class="tag">Cloudflare Pages</span><div class="body"><h3>Public website</h3><p>Hosts this site and its static content.</p></div></li>
+        <li><span class="tag">Cloudflare R2</span><div class="body"><h3>Smaller components</h3><p>Candidate host for lighter downloadable resources.</p></div></li>
+        <li><span class="tag">GitHub Releases</span><div class="body"><h3>Source &amp; larger artifacts</h3><p>Source code and, where appropriate, bigger release downloads.</p></div></li>
+        <li><span class="tag">Upstream providers</span><div class="body"><h3>Third-party tools</h3><p>Direct from the maintainer when that's the better install path.</p></div></li>
+      </ul>
+      <p class="section-sub" style="margin-top:20px;">The exact catalog, hosting split, and install mechanism are still being finalized.</p>
+    </div>
+  </section>
+
+  <section id="source">
+    <div class="wrap">
+      <h2>Source code &amp; contributions</h2>
+      <p class="section-sub">Repositories, issue tracking, contribution guidelines, and licensing will be linked here as they're published. For now, this is a placeholder — ∆LLURΞ is the project's sole developer during the planning phase.</p>
+    </div>
+  </section>
+
+  <section id="status">
+    <div class="wrap">
+      <h2>Project status &amp; roadmap</h2>
+      <p class="section-sub">A transparent read on what's real versus what's planned.</p>
+      <div class="roadmap">
+        <div class="road-row">
+          <span class="road-stage active">now</span>
+          <div class="road-body"><h3>Planning</h3><p>Architecture, feasibility, dependency distribution, security, and packaging are being evaluated before any implementation starts. The Cloudflare Pages site (this page) is the first real artifact.</p></div>
+        </div>
+        <div class="road-row">
+          <span class="road-stage">next</span>
+          <div class="road-body"><h3>Core architecture</h3><p>Separating UI, project management, language/framework integration, dependency management, execution, debugging, build, packaging, and platform services.</p></div>
+        </div>
+        <div class="road-row">
+          <span class="road-stage">later</span>
+          <div class="road-body"><h3>First workflow, end to end</h3><p>One complete path — likely Python desktop with PySide6, or FastAPI backend — from new project to packaged build on Windows.</p></div>
+        </div>
+        <div class="road-row">
+          <span class="road-stage">future</span>
+          <div class="road-body"><h3>Linux &amp; macOS</h3><p>Expanding beyond the initial Windows target once the Windows workflow is solid.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>FAQ</h2>
+      <details class="faq-item" open>
+        <summary>Is Decibles available yet?</summary>
+        <p>No. It's in the planning phase — no implementation has started. This site will be updated as that changes.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Will it force me into a proprietary project format?</summary>
+        <p>No. Decibles is designed to preserve conventional project structures and existing ecosystem configuration, adding a manifest only where it genuinely helps.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What languages and frameworks will it support?</summary>
+        <p>It will support multiple languages, but prioritize complete, well-tested workflows for a smaller set — starting with Python/PySide6 for desktop and FastAPI for backend.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does it reinvent compilers and build tools?</summary>
+        <p>No. Decibles orchestrates established compilers, SDKs, package managers, debuggers, and build systems rather than replacing them.</p>
+      </details>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <h2>Contact &amp; community</h2>
+      <p class="section-sub">Official channels will be linked here once established.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <p>Decibles — planning phase. Built by ∆LLURΞ.</p>
+    <div class="footer-links">
+      <a href="#top">Back to top</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
