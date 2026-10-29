@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore the proposed development roadmap for Decibles IDE, from technical feasibility to an initial release.">
+  <meta name="theme-color" content="#f4f2ee">
+  <title>Roadmap | Decibles</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/style.css">
+
+  <style>
+    .roadmap-intro {
+      max-width: 720px;
+    }
+
+    .roadmap-intro h1 {
+      max-width: 16ch;
+    }
+
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--accent-2);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .roadmap-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 28px 0 0;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border: 1px solid var(--panel-line);
+      background: var(--panel);
+      border-radius: 7px;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .meta-chip .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .roadmap-overview {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 36px;
+    }
+
+    .overview-item {
+      padding: 17px;
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: 10px;
+    }
+
+    .overview-item .number {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent-2);
+      margin-bottom: 10px;
+    }
+
+    .overview-item strong {
+      display: block;
+      font-size: 0.94rem;
+      margin-bottom: 5px;
+    }
+
+    .overview-item p {
+      margin: 0;
+      color: var(--text-dim);
+      font-size: 0.84rem;
+    }
+
+    .roadmap {
+      position: relative;
+    }
+
+    .road-row {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 20px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--panel-line);
+    }
+
+    .road-row:last-child {
+      border-bottom: none;
+    }
+
+    .road-stage {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      padding-top: 4px;
+    }
+
+    .road-stage.active {
+      color: var(--accent);
+    }
+
+    .stage-label {
+      display: inline-block;
+      margin-top: 10px;
+      font-size: 0.66rem;
+      padding: 4px 7px;
+      border-radius: 5px;
+      border: 1px solid var(--panel-line);
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .stage-label.current {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-bg);
+    }
+
+    .road-body h3 {
+      font-size: 1.04rem;
+      margin: 0 0 8px;
+    }
+
+    .road-body > p {
+      color: var(--text-dim);
+      font-size: 0.91rem;
+      margin: 0 0 15px;
+      max-width: 65ch;
+    }
+
+    .road-body ul {
+      margin: 0;
+      padding-left: 19px;
+      color: var(--text-dim);
+      font-size: 0.87rem;
+    }
+
+    .road-body li {
+      padding: 3px 0;
+    }
+
+    .road-body li::marker {
+      color: var(--accent-2);
+    }
+
+    .milestone {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: var(--accent-bg);
+      border-radius: 7px;
+      font-size: 0.83rem;
+    }
+
+    .milestone strong {
+      color: var(--accent);
+    }
+
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .principle-card {
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: 10px;
+      padding: 20px;
+    }
+
+    .principle-card .index {
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--accent-2);
+      margin-bottom: 12px;
+    }
+
+    .principle-card h3 {
+      font-size: 0.97rem;
+      margin: 0 0 8px;
+    }
+
+    .principle-card p {
+      font-size: 0.88rem;
+      color: var(--text-dim);
+      margin: 0;
+    }
+
+    .roadmap-end {
+      padding: 24px;
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: 10px;
+    }
+
+    .roadmap-end h3 {
+      margin: 0 0 8px;
+      font-size: 1.05rem;
+    }
+
+    .roadmap-end p {
+      margin: 0;
+      max-width: 65ch;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 640px) {
+      .roadmap-overview {
+        grid-template-columns: 1fr;
+      }
+
+      .road-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .road-stage {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .stage-label {
+        margin-top: 0;
+      }
+
+      .principles-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">
+        Decibles
+        <small>IDE / ROADMAP</small>
+      </a>
+
+      <nav class="links" aria-label="Main navigation">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="downloads.html">Downloads</a>
+        <a href="docs.html">Docs</a>
+        <a href="dependencies.html">Dependencies</a>
+        <a href="source.html">Source</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+
+      <!-- INTRODUCTION -->
+      <section class="hero flush roadmap-intro">
+        <div class="eyebrow">Development / Roadmap</div>
+
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Planning phase
+        </div>
+
+        <h1>Building Decibles, one phase at a time.</h1>
+
+        <p class="lede">
+          Decibles is being designed as a unified environment for application
+          development. This roadmap outlines the intended path from technical
+          research and architectural decisions to a potential initial release.
+        </p>
+
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#phases">Explore the roadmap &darr;</a>
+          <a class="btn btn-ghost" href="source.html">View source information</a>
+        </div>
+
+        <div class="roadmap-meta">
+          <span class="meta-chip">
+            <span class="dot"></span>
+            Status: Planning
+          </span>
+          <span class="meta-chip">Initial target: Windows</span>
+          <span class="meta-chip">No release date set</span>
+        </div>
+
+        <div class="roadmap-overview">
+          <div class="overview-item">
+            <span class="number">01 / RESEARCH</span>
+            <strong>Establish feasibility</strong>
+            <p>Validate the proposed technologies, tools, and workflows.</p>
+          </div>
+
+          <div class="overview-item">
+            <span class="number">02 / DESIGN</span>
+            <strong>Define the system</strong>
+            <p>Specify the modules, project model, and integration contracts.</p>
+          </div>
+
+          <div class="overview-item">
+            <span class="number">03 / BUILD</span>
+            <strong>Deliver incrementally</strong>
+            <p>Implement and verify a limited set of complete workflows.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROADMAP PHASES -->
+      <section id="phases">
+        <div class="eyebrow">01 / Planned milestones</div>
+        <h2>The development path</h2>
+        <p class="section-sub">
+          These phases describe the proposed development sequence. They are
+          not delivery commitments, and their scope may change as technical
+          feasibility is evaluated.
+        </p>
+
+        <div class="roadmap">
+
+          <article class="road-row">
+            <div class="road-stage active">
+              PHASE 00
+              <span class="stage-label current">Current focus</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Product definition and planning</h3>
+              <p>
+                Establish what Decibles is, which problems it should solve,
+                and what belongs in its initial scope.
+              </p>
+              <ul>
+                <li>Define the product direction and target audience.</li>
+                <li>Identify the initial application categories.</li>
+                <li>Establish the modular architecture philosophy.</li>
+                <li>Define the project manifest and import strategy.</li>
+                <li>Identify initial technology candidates and non-goals.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Objective:</strong>
+                Establish a coherent specification before implementation.
+              </div>
+            </div>
+          </article>
+
+          <article class="road-row">
+            <div class="road-stage">
+              PHASE 01
+              <span class="stage-label">Proposed</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Technical feasibility</h3>
+              <p>
+                Investigate the riskiest assumptions before committing to
+                implementation details or an extensive technology stack.
+              </p>
+              <ul>
+                <li>Evaluate PySide6/Qt for the desktop interface.</li>
+                <li>Assess editor components and language-server integration.</li>
+                <li>Investigate debugging and terminal integration.</li>
+                <li>Evaluate Python desktop packaging and backend workflows.</li>
+                <li>Review dependency distribution, security, licensing, and maintenance.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Exit goal:</strong>
+                Identify a technically credible initial implementation scope
+                and resolve or explicitly accept major risks.
+              </div>
+            </div>
+          </article>
+
+          <article class="road-row">
+            <div class="road-stage">
+              PHASE 02
+              <span class="stage-label">Proposed</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Architecture and detailed design</h3>
+              <p>
+                Turn the approved direction into explicit module boundaries,
+                interfaces, data models, and implementation specifications.
+              </p>
+              <ul>
+                <li>Define core services and module contracts.</li>
+                <li>Specify project discovery, creation, and import behavior.</li>
+                <li>Design dependency metadata and environment management.</li>
+                <li>Define diagnostics, task execution, and logging conventions.</li>
+                <li>Establish test strategy and security boundaries.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Exit goal:</strong>
+                Produce an implementation-ready architecture with clear
+                responsibilities and acceptance criteria.
+              </div>
+            </div>
+          </article>
+
+          <article class="road-row">
+            <div class="road-stage">
+              PHASE 03
+              <span class="stage-label">Proposed</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Core foundation</h3>
+              <p>
+                Build the minimum desktop application foundation needed to
+                support reliable project workflows.
+              </p>
+              <ul>
+                <li>Establish the application shell and navigation.</li>
+                <li>Implement settings, logging, and error reporting.</li>
+                <li>Introduce the project model and manifest validation.</li>
+                <li>Implement task execution without blocking the UI.</li>
+                <li>Establish automated testing and packaging for Decibles itself.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Exit goal:</strong>
+                A stable foundation that can host development integrations.
+              </div>
+            </div>
+          </article>
+
+          <article class="road-row">
+            <div class="road-stage">
+              PHASE 04
+              <span class="stage-label">Proposed</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Initial development workflows</h3>
+              <p>
+                Integrate a deliberately limited set of technologies and
+                deliver useful end-to-end workflows instead of superficial
+                language support.
+              </p>
+              <ul>
+                <li>Create and import supported projects.</li>
+                <li>Configure project-scoped environments and dependencies.</li>
+                <li>Provide editing, diagnostics, and execution.</li>
+                <li>Integrate debugging where technically feasible.</li>
+                <li>Implement appropriate build and packaging workflows.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Exit goal:</strong>
+                Complete, testable workflows for the selected initial technologies.
+              </div>
+            </div>
+          </article>
+
+          <article class="road-row">
+            <div class="road-stage">
+              PHASE 05
+              <span class="stage-label">Proposed</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Validation and release preparation</h3>
+              <p>
+                Verify that the supported workflows behave reliably on real
+                systems and that the application can be distributed safely.
+              </p>
+              <ul>
+                <li>Test project creation, import, and recovery scenarios.</li>
+                <li>Validate dependency integrity and installation failures.</li>
+                <li>Test packaging, clean installations, and upgrades.</li>
+                <li>Document supported environments and known limitations.</li>
+                <li>Prepare release artifacts and user documentation.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Exit goal:</strong>
+                Determine whether the initial release meets defined quality
+                and reliability criteria.
+              </div>
+            </div>
+          </article>
+
+          <article class="road-row">
+            <div class="road-stage">
+              PHASE 06+
+              <span class="stage-label">Long-term</span>
+            </div>
+
+            <div class="road-body">
+              <h3>Expansion and refinement</h3>
+              <p>
+                Expand based on actual user needs, verified feasibility, and
+                the maintainability of the initial system.
+              </p>
+              <ul>
+                <li>Consider additional languages and framework integrations.</li>
+                <li>Improve project templates and developer workflows.</li>
+                <li>Evaluate Linux and macOS support.</li>
+                <li>Refine accessibility, performance, and usability.</li>
+                <li>Consider additional packaging and distribution capabilities.</li>
+              </ul>
+              <div class="milestone">
+                <strong>Exit goal:</strong>
+                Expand deliberately without compromising reliability or
+                turning the IDE into an unmaintainable collection of integrations.
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- GUIDING PRINCIPLES -->
+      <section>
+        <div class="eyebrow">02 / Development principles</div>
+        <h2>What guides the roadmap</h2>
+        <p class="section-sub">
+          The roadmap is organized around a few principles intended to keep
+          the project useful, maintainable, and realistic.
+        </p>
+
+        <div class="principles-grid">
+          <article class="principle-card">
+            <div class="index">PRINCIPLE / 01</div>
+            <h3>Complete workflows over checklists</h3>
+            <p>
+              A small number of well-integrated technologies is more useful
+              than a long list of languages that only have syntax highlighting.
+            </p>
+          </article>
+
+          <article class="principle-card">
+            <div class="index">PRINCIPLE / 02</div>
+            <h3>Use established tools</h3>
+            <p>
+              Decibles should orchestrate proven compilers, SDKs, debuggers,
+              and package managers instead of unnecessarily recreating them.
+            </p>
+          </article>
+
+          <article class="principle-card">
+            <div class="index">PRINCIPLE / 03</div>
+            <h3>Keep the core lightweight</h3>
+            <p>
+              Optional integrations and development tools should be installed
+              when needed rather than bundled indiscriminately.
+            </p>
+          </article>
+
+          <article class="principle-card">
+            <div class="index">PRINCIPLE / 04</div>
+            <h3>Verify before expanding</h3>
+            <p>
+              Major technical assumptions should be investigated before they
+              become expensive architectural commitments.
+            </p>
+          </article>
+
+          <article class="principle-card">
+            <div class="index">PRINCIPLE / 05</div>
+            <h3>Preserve existing projects</h3>
+            <p>
+              Conventional source files and ecosystem configuration should
+              remain usable without unnecessary proprietary conversion.
+            </p>
+          </article>
+
+          <article class="principle-card">
+            <div class="index">PRINCIPLE / 06</div>
+            <h3>Make limitations visible</h3>
+            <p>
+              Compatibility claims, integration levels, and known limitations
+              should be documented honestly and tested on the actual target platform.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- SCOPE -->
+      <section>
+        <div class="eyebrow">03 / Scope control</div>
+        <h2>What the initial release is not trying to do</h2>
+        <p class="section-sub">
+          A realistic initial release needs clear boundaries. These are
+          current planning constraints, not permanent restrictions on the project.
+        </p>
+
+        <div class="grid">
+          <article class="card">
+            <h3>Not every language at launch</h3>
+            <p>
+              Language support will expand according to the quality and
+              completeness of each integration.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Not every SDK bundled</h3>
+            <p>
+              Large toolchains and optional dependencies should remain
+              independently managed wherever practical.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Not a game engine</h3>
+            <p>
+              Decibles is intended for application development, not as a
+              general-purpose game engine or game-development environment.
+            </p>
+          </article>
+
+          <article class="card">
+            <h3>Not simulated compatibility</h3>
+            <p>
+              Static checks or simulations must not be represented as genuine
+              native execution or builds on another operating system.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- TRANSPARENCY -->
+      <section>
+        <div class="roadmap-end">
+          <div class="eyebrow">04 / Transparency</div>
+          <h3>A roadmap, not a release promise.</h3>
+          <p>
+            Decibles remains in the planning phase. No public release date
+            has been established, and no implementation milestones should be
+            considered complete until they have been built and verified.
+            This roadmap will evolve as feasibility research, architecture
+            decisions, and implementation provide better evidence about
+            the project's scope and timeline.
+          </p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-row">
+        <p>Decibles &middot; Application development, unified.</p>
+
+        <div class="footer-links">
+          <a href="index.html">Home</a>
+          <a href="source.html">Source</a>
+          <a href="status.html">Status</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
